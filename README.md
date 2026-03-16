@@ -43,7 +43,6 @@ or
 ``` r
 # install.packages("remotes")
 remotes::install_github("chikuang/cvxDesign")
-library(cvxDesign)
 ```
 
 ## Details
@@ -85,6 +84,13 @@ for these computations, together with tools for:
 
 ## Examples
 
+First load the package.
+
+``` r
+# load package
+library(cvxDesign)
+```
+
 ### D-optimal design for a quadratic regression model
 
 Consider the quadratic regression model
@@ -113,16 +119,31 @@ head(u)
 A typical workflow in `cvxDesign` will look like the following.
 
 ``` r
-library(cvxDesign)
-
-dout <- d_optimal_design(
+dout <- calc_Dopt(
   u = u,
-  f = quad_reg
+  f = quad_reg,
+  drop_tol = 1e-4
 )
 
-dout$design
+dout$design |> round(3)
+```
+
+      point weight
+    1    -1  0.333
+    2     0  0.333
+    3     1  0.333
+
+``` r
 dout$value
 ```
+
+    [1] -1.909543
+
+``` r
+dout$status
+```
+
+    [1] "optimal"
 
 The returned object is expected to contain at least:
 
@@ -138,14 +159,31 @@ Similarly, one may compute the A-optimal design by changing the
 criterion.
 
 ``` r
-aout <- a_optimal_design(
+aout <- calc_Aopt(
   u = u,
-  f = quad_reg
+  f = quad_reg,
+  drop_tol = 1e-4
 )
 
-aout$design
+aout$design |> round(3)
+```
+
+      point weight
+    1    -1   0.25
+    2     0   0.50
+    3     1   0.25
+
+``` r
 aout$value
 ```
+
+    [1] 8
+
+``` r
+aout$status
+```
+
+    [1] "optimal"
 
 ### c-optimal design
 
@@ -182,8 +220,8 @@ plot_equivalence(
 
 - [x] Basic package infrastructure
 - [x] Core support for convex-optimization-based design computation
-- [ ] D-optimality
-- [ ] A-optimality
+- [x] D-optimality
+- [x] A-optimality
 - [ ] E-optimality
 - [ ] c-optimality
 - [ ] Compound and multi-objective criteria
