@@ -1,16 +1,27 @@
 Package: cvxDesign
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Compute Optimal Regression Design under the Ordinary Least Squares Estimator for Variety of the design criteria
 Version: 0.1.0
-Authors@R: c(
-    person(
-      "Jane", "Doe",
-      email = "jane@example.com",
-      role = c("aut", "cre")
-    )
-  )
-Description: More about what it does (maybe more than one line).
-    Continuation lines should be indented.
-License: What license is it under?
+Authors@R:  c(
+      person(given = "Chi-Kuang", family = "Yeh",
+             role = c("aut", "cre"),
+             email = "cyeh@gsu.edu",
+             comment = c(ORCID = "0000-0001-7057-2096")),
+      person(given = "Julie", family = "Zhou",
+             role = c("aut", "ctb"))
+             )
+Description: With given inputs that include number of points, discrete design space, models and parameter value, this package calculates the objective value, optimal designs and plot the equivalence theory under variety of the optimal criteria under the Ordinary Least squares estimator.
+URL: https://github.com/chikuang/cvxDesign
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Imports: 
+    CVXR (>= 1.8.0)
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+Config/testthat/edition: 3
