@@ -191,17 +191,33 @@ If the target is a specific linear combination $c^\top \theta$, then a
 c-optimal design can be computed by supplying the vector `cvec`.
 
 ``` r
-cout <- c_optimal_design(
+cout <- calc_copt(
   u = u,
   f = quad_reg,
-  cvec = c(0, 1, 0)
+  cVec = c(0.3, 0.4, 0.3),
+  drop_tol = 1e-4
 )
 
-cout$design
+cout$design |> round(3)
+```
+
+      point weight
+    1    -1  0.125
+    2     1  0.875
+
+``` r
 cout$value
 ```
 
-### Equivalence theorem diagnostics
+    [1] 0.16
+
+``` r
+cout$status
+```
+
+    [1] "optimal"
+
+### Equivalence theorem
 
 An important part of optimal design computation is verification.  
 The package is designed to support equivalence-theorem-based diagnostics
@@ -225,8 +241,7 @@ plot_equivalence(
 - [ ] E-optimality
 - [ ] c-optimality
 - [ ] Compound and multi-objective criteria
-- [ ] Equivalence theorem diagnostics
-- [ ] Plotting methods for sensitivity functions
+- [ ] Equivalence theorem (sensitivity functions) diagnostics
 - [ ] Exact design support on finite candidate sets
 - [ ] Benchmark examples and vignettes
 - [ ] Shiny app
