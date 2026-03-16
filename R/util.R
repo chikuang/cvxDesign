@@ -74,3 +74,20 @@ info_matrix <- function(weights, Fmat) {
 
   crossprod(Fmat, weights * Fmat)
 }
+
+
+
+#' Evaluate regression vector at one design point
+#'
+#' @param x A single design point.
+#' @param f Regression function.
+#'
+#' @return Numeric column vector.
+#' @noRd
+eval_regvec <- function(x, f) {
+  out <- f(x)
+  if (is.matrix(out) && ncol(out) == 1) {
+    out <- as.vector(out)
+  }
+  as.numeric(out)
+}

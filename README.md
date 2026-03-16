@@ -232,6 +232,48 @@ plot_equivalence(
 )
 ```
 
+``` r
+quad_reg <- function(x) c(1, x, x^2)
+u <- seq(-1, 1, length.out = 101)
+
+dout <- calc_Dopt(u, quad_reg, drop_tol = 1e-4)
+eq_d <- check_equivalence(dout, f = quad_reg)
+
+print(eq_d)
+```
+
+    Equivalence theorem check
+    Criterion          : D 
+    Tolerance          : 1e-06 
+    Max violation      : 3.94291e-05 
+    All nonpositive    : FALSE 
+    Support equal zero : FALSE 
+
+``` r
+plot_equivalence(eq_d)
+```
+
+![](README_files/figure-commonmark/equivalence-1.png)
+
+``` r
+# Aopt
+aout <- calc_Aopt(u, quad_reg, drop_tol = 1e-4)
+eq_a <- check_equivalence(aout, f = quad_reg)
+plot_equivalence(eq_a)
+```
+
+![](README_files/figure-commonmark/equivalence-2.png)
+
+``` r
+# copt
+cout <- calc_copt(u, quad_reg, cVec = c(1, 0.5, 0),
+                  drop_tol = 1e-6)
+eq_c <- check_equivalence(cout, f = quad_reg)
+plot_equivalence(eq_c)
+```
+
+![](README_files/figure-commonmark/copt%20equivalence-1.png)
+
 ## Planned features
 
 - [x] Basic package infrastructure

@@ -175,6 +175,32 @@ plot_equivalence(
 )
 ```
 
+
+``` {r equivalence}
+quad_reg <- function(x) c(1, x, x^2)
+u <- seq(-1, 1, length.out = 101)
+
+dout <- calc_Dopt(u, quad_reg, drop_tol = 1e-4)
+eq_d <- check_equivalence(dout, f = quad_reg)
+
+print(eq_d)
+plot_equivalence(eq_d)
+
+# Aopt
+aout <- calc_Aopt(u, quad_reg, drop_tol = 1e-4)
+eq_a <- check_equivalence(aout, f = quad_reg)
+plot_equivalence(eq_a)
+```
+
+``` {r copt equivalence}
+
+# copt
+cout <- calc_copt(u, quad_reg, cVec = c(1, 0.5, 0),
+                  drop_tol = 1e-6)
+eq_c <- check_equivalence(cout, f = quad_reg)
+plot_equivalence(eq_c)
+```
+
 ## Planned features
 
 - [x] Basic package infrastructure
