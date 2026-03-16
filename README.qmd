@@ -1,0 +1,196 @@
+---
+title: "cvxDesign: Optimal experimental designs via convex optimization"
+date: last-modified
+format:
+  gfm:
+    toc: false
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+**Authors:**  
+Chi-Kuang Yeh (Georgia State University)  
+Julie Zhou (University of Victoria)
+
+<!-- badges: start -->
+<!-- [![R-CMD-check](https://github.com/chikuang/cvxDesign/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/chikuang/cvxDesign/actions/workflows/R-CMD-check.yaml) -->
+[![](https://img.shields.io/github/languages/code-size/chikuang/cvxDesign.svg)](https://github.com/chikuang/cvxDesign)
+<!-- badges: end -->
+
+## Description
+
+`cvxDesign` is an R package for computing optimal experimental designs using convex optimization.  
+The package is intended for researchers and practitioners working on approximate and exact design problems under a variety of criteria, including classical criteria such as D-, A-, E-, and c-optimality, as well as compound and multi-objective design problems.
+
+The package is motivated by modern design settings where efficient numerical optimization, equivalence-theorem-based verification, and flexible model specification are all essential.
+
+## Installation
+
+You can install the development version of `cvxDesign` from GitHub by running
+
+```r
+# install.packages("pak")
+pak::pak("chikuang/cvxDesign")
+```
+
+or
+
+```r
+# install.packages("remotes")
+remotes::install_github("chikuang/cvxDesign")
+library(cvxDesign)
+```
+
+## Details
+
+Consider a regression model of the form
+
+$$
+y_i = \eta(\mathbf{x}_i, \boldsymbol{\theta}) + \varepsilon_i, \quad i = 1, \ldots, n,
+$$
+
+where $y_i$ is the response observed at design point $\mathbf{x}_i \in \mathcal{X}$,  
+$\boldsymbol{\theta} \in \mathbb{R}^p$ is an unknown parameter vector, and $\eta(\mathbf{x}, \boldsymbol{\theta})$ is the mean response function, which may be linear or nonlinear in the parameters.
+
+Optimal design seeks a design measure $\xi$ over the design space $\mathcal{X}$ that optimizes a scalar criterion based on the information matrix $M(\xi)$. Common criteria include:
+
+- **D-optimality**, which maximizes $\log \det M(\xi)$;
+- **A-optimality**, which minimizes $\operatorname{tr}\{M^{-1}(\xi)\}$;
+- **E-optimality**, which maximizes the minimum eigenvalue of $M(\xi)$;
+- **c-optimality**, which minimizes the variance of estimating a specified linear combination of parameters.
+
+In many applications, the design problem can be formulated and solved using convex optimization. This makes it possible to handle a wide range of criteria and constraints in a unified computational framework.
+
+The goal of `cvxDesign` is to provide a clean and extensible interface for these computations, together with tools for:
+
+- computing optimal approximate designs,
+- studying exact designs on finite candidate sets,
+- evaluating design efficiency,
+- checking equivalence theorems,
+- visualizing directional derivative or sensitivity functions.
+
+## Examples
+
+### D-optimal design for a quadratic regression model
+
+Consider the quadratic regression model
+
+$$
+y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 + \varepsilon_i.
+$$
+
+We first define the regression function.
+
+```{r}
+quad_reg <- function(x) {
+  c(1, x, x^2)
+}
+```
+
+Suppose the candidate design space is a finite grid on $[-1,1]$.
+
+```{r}
+u <- seq(-1, 1, length.out = 101)
+head(u)
+```
+
+A typical workflow in `cvxDesign` will look like the following.
+
+```{r eval=FALSE}
+library(cvxDesign)
+
+dout <- d_optimal_design(
+  u = u,
+  f = quad_reg
+)
+
+dout$design
+dout$value
+```
+
+The returned object is expected to contain at least:
+
+- the selected support points,
+- the corresponding optimal weights,
+- the value of the design criterion,
+- and, when requested, information useful for equivalence-theorem checks.
+
+### A-optimal design
+
+Similarly, one may compute the A-optimal design by changing the criterion.
+
+```{r eval=FALSE}
+aout <- a_optimal_design(
+  u = u,
+  f = quad_reg
+)
+
+aout$design
+aout$value
+```
+
+### c-optimal design
+
+If the target is a specific linear combination $c^\top \theta$, then a c-optimal design can be computed by supplying the vector `cvec`.
+
+```{r eval=FALSE}
+cout <- c_optimal_design(
+  u = u,
+  f = quad_reg,
+  cvec = c(0, 1, 0)
+)
+
+cout$design
+cout$value
+```
+
+### Equivalence theorem diagnostics
+
+An important part of optimal design computation is verification.  
+The package is designed to support equivalence-theorem-based diagnostics and plotting.
+
+```{r eval=FALSE}
+plot_equivalence(
+  design = dout$design,
+  u = u,
+  f = quad_reg,
+  criterion = "D"
+)
+```
+
+## Planned features
+
+- [x] Basic package infrastructure
+- [x] Core support for convex-optimization-based design computation
+- [ ] D-optimality
+- [ ] A-optimality
+- [ ] E-optimality
+- [ ] c-optimality
+- [ ] Compound and multi-objective criteria
+- [ ] Equivalence theorem diagnostics
+- [ ] Plotting methods for sensitivity functions
+- [ ] Exact design support on finite candidate sets
+- [ ] Benchmark examples and vignettes
+- [ ] Shiny app
+- [ ] JSS paper companion materials
+
+## Package vision
+
+The long-term goal of `cvxDesign` is to provide a general computational framework for modern optimal design problems, including:
+
+- classical regression design,
+- heteroscedastic models,
+- constrained design problems,
+- compound and robust criteria,
+- group testing design,
+- and other application-driven problems arising in statistics, biostatistics, and machine learning.
+
+## References
+
+1. Atkinson, Anthony C., Donev, Aleksandar N., and Tobias, Randall D. (2007). *Optimum Experimental Designs, with SAS*. Oxford University Press.
+2. Fedorov, Valerii V. (1972). *Theory of Optimal Experiments*. Academic Press.
+3. Pukelsheim, Friedrich. (2006). *Optimal Design of Experiments*. SIAM.
+4. Silvey, Samuel D. (1980). *Optimal Design*. Chapman and Hall.
+5. Yeh, Chi-Kuang and collaborators. Ongoing work on convex-optimization-based methods for compound and application-driven optimal design problems.
