@@ -64,7 +64,7 @@ $\mathcal{X}$ that optimizes a scalar criterion based on the information
 matrix $M(\xi)$. Common criteria include:
 
 - **D-optimality**, which maximizes $\log \det M(\xi)$;
-- **A-optimality**, which minimizes $\operatorname{tr}\{M^{-1}(\xi)\}$;
+- **A-optimality**, which minimizes $\mathrm{tr}\{M^{-1}(\xi)\}$;
 - **E-optimality**, which maximizes the minimum eigenvalue of $M(\xi)$;
 - **c-optimality**, which minimizes the variance of estimating a
   specified linear combination of parameters.
