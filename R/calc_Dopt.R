@@ -1,0 +1,68 @@
+#' Compute a D-optimal approximate design on a finite candidate set
+#'
+#' @param u Candidate design points.
+#' @param f Regression function returning a numeric vector.
+#' @param solver Solver name passed to CVXR. Default is "CLARABEL".
+#' @param ... Additional arguments passed to CVXR::psolve().
+#' @param drop_tol Threshold for removing near-zero weights.
+#'
+#' @return An object of class "cvx_d_design" and "cvx_design".
+#' @export
+calc_Dopt <- function(u,
+                             f,
+                             solver = "CLARABEL",
+                             ...,
+                             drop_tol = 1e-8) {
+  if (!requireNamespace("CVXR", quietly = TRUE)) {
+    stop("Package `CVXR` is required.", call. = FALSE)
+  }
+
+  validate_design_inputs(u, f)
+  Fmat <- build_model_matrix(u, f)
+
+  n <- nrow(Fmat)
+
+  w <- CVXR::Variable(n, nonneg = TRUE)
+
+  M_expr <- Reduce(
+    `+`,
+    lapply(seq_len(n), function(i) {
+      w[i] * tcrossprod(Fmat[i, ])
+    })
+  )
+
+  problem <- CVXR::Problem(
+    CVXR::Maximize(CVXR::log_det(M_expr)),
+    constraints = list(sum(w) == 1)
+  )
+
+  optval <- CVXR::psolve(problem, solver = solver, ...)
+  solver_status <- CVXR::status(problem)
+
+  w_opt <- as.numeric(CVXR::value(w))
+  w_opt[abs(w_opt) < drop_tol] <- 0
+  w_opt <- w_opt / sum(w_opt)
+
+  M_opt <- info_matrix(w_opt, Fmat)
+  crit_val <- as.numeric(determinant(M_opt, logarithm = TRUE)$modulus)
+
+  design <- data.frame(point = u, weight = w_opt)
+  design <- design[design$weight > 0, , drop = FALSE]
+  rownames(design) <- NULL
+
+  out <- list(
+    design = design,
+    weights = w_opt,
+    candidates = u,
+    Fmat = Fmat,
+    info_matrix = M_opt,
+    criterion = "D",
+    value = crit_val,
+    optval = optval,
+    status = solver_status,
+    solver = solver
+  )
+
+  class(out) <- c("cvx_d_design", "cvx_design")
+  out
+}

@@ -2,16 +2,18 @@
 
 2026-03-16
 
-**Authors:**  
-Chi-Kuang Yeh (Georgia State University)  
-Julie Zhou (University of Victoria)
-
 <!-- badges: start -->
 
 <!-- [![R-CMD-check](https://github.com/chikuang/cvxDesign/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/chikuang/cvxDesign/actions/workflows/R-CMD-check.yaml) -->
 
 [![](https://img.shields.io/github/languages/code-size/chikuang/cvxDesign.svg)](https://github.com/chikuang/cvxDesign)
 <!-- badges: end -->
+
+**Authors:**  
+Chi-Kuang Yeh (Georgia State University)  
+[![ORCID](https://img.shields.io/badge/ORCID-0000--0001--7057--2096-A6CE39?logo=orcid.png)](https://orcid.org/0000-0001-7057-2096)
+
+Julie Zhou (University of Victoria)
 
 ## Description
 
