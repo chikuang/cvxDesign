@@ -287,8 +287,8 @@ peleg_reg <- function(x, theta) {
     d2 <- -theta[1] * x / (theta[2] + x)^2
     c(d1, d2)
 }
-u <- seq(0.1, 10, length.out = 101)
-theta_nom <- c(1, 1)
+u <- seq(0.1, 100, length.out = 1001)
+theta_nom <- c(0.05, 0.5)
 dout <- calc_Dopt(u, 
                   function(x) peleg_reg(x, theta = theta_nom), 
                   drop_tol = 1e-4)
@@ -297,15 +297,18 @@ dout$design |>
   round(3)
 ```
 
-       point weight
-    1  0.793    0.5
-    2 10.000    0.5
+      point weight
+    1   0.5  0.501
+    2  99.7  0.001
+    3  99.8  0.004
+    4  99.9  0.013
+    5 100.0  0.480
 
 ``` r
 dout$value
 ```
 
-    [1] -4.732202
+    [1] -8.794024
 
 ``` r
 dout$status
