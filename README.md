@@ -1,6 +1,6 @@
 # cvxDesign: Optimal experimental designs via convex optimization
 
-2026-03-16
+2026-03-19
 
 <!-- badges: start -->
 
@@ -224,15 +224,6 @@ The package is designed to support equivalence-theorem-based diagnostics
 and plotting.
 
 ``` r
-plot_equivalence(
-  design = dout$design,
-  u = u,
-  f = quad_reg,
-  criterion = "D"
-)
-```
-
-``` r
 quad_reg <- function(x) c(1, x, x^2)
 u <- seq(-1, 1, length.out = 101)
 
@@ -253,7 +244,7 @@ print(eq_d)
 plot_equivalence(eq_d)
 ```
 
-![](README_files/figure-commonmark/equivalence-1.png)
+![](README_files/figure-commonmark/equivalence%20for%20A-%20and%20D-optimalities-1.png)
 
 ``` r
 # Aopt
@@ -262,7 +253,7 @@ eq_a <- check_equivalence(aout, f = quad_reg)
 plot_equivalence(eq_a)
 ```
 
-![](README_files/figure-commonmark/equivalence-2.png)
+![](README_files/figure-commonmark/equivalence%20for%20A-%20and%20D-optimalities-2.png)
 
 ``` r
 # copt
@@ -273,6 +264,54 @@ plot_equivalence(eq_c)
 ```
 
 ![](README_files/figure-commonmark/copt%20equivalence-1.png)
+
+## For non-linear models
+
+For non-linear models, the information matrix depends on the unknown
+parameters. In this case, the package supports local optimal design
+computation at a specified nominal parameter value. For instance, the
+peleg model is given as $$
+y_i = \frac{\theta_1 x_i}{\theta_2 + x_i } + \varepsilon_i.
+$$
+
+One needs to calculate the partial derivatives of the mean function with
+respect to the parameters, which will be used in the information matrix
+calculation. In this case, it is $$
+\frac{\partial \eta}{\partial \theta_1} = \frac{x}{\theta_2 + x}, \quad
+\frac{\partial \eta}{\partial \theta_2} = -\frac{\theta_1 x}{(\theta_2 + x)^2}.
+$$
+
+``` r
+peleg_reg <- function(x, theta) {
+    d1 <- x / (theta[2] + x)
+    d2 <- -theta[1] * x / (theta[2] + x)^2
+    c(d1, d2)
+}
+u <- seq(0.1, 10, length.out = 101)
+theta_nom <- c(1, 1)
+dout <- calc_Dopt(u, 
+                  function(x) peleg_reg(x, theta = theta_nom), 
+                  drop_tol = 1e-4)
+dout$design |>
+  dplyr::filter(.data$weight > 1e-3) |>
+  round(3)
+```
+
+       point weight
+    1  0.793    0.5
+    2 10.000    0.5
+
+``` r
+dout$value
+```
+
+    [1] -4.732202
+
+``` r
+dout$status
+```
+
+    [1] "optimal"
 
 ## Planned features
 
