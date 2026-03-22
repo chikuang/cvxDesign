@@ -684,9 +684,9 @@ plot_equivalence_maximin(
 - [x] D-optimality
 - [x] A-optimality
 - [ ] E-optimality
-- [ ] c-optimality
-- [ ] Compound and multi-objective criteria
-- [ ] Equivalence theorem (sensitivity functions) diagnostics
+- [x] c-optimality
+- [x] Compound and multi-objective criteria
+- [x] Equivalence theorem (sensitivity functions) diagnostics
 - [ ] Exact design support on finite candidate sets
 - [ ] Benchmark examples and vignettes
 - [ ] Shiny app
