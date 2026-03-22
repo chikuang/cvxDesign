@@ -230,7 +230,74 @@ dout$status
 The maximin design is a robust design that maximizes the minimum efficiency across a set of candidate parameter values or different design criteria. For instance, one may want to find a design that performs well across multiple nominal parameter values in a non-linear model. This can be achieved by specifying a set of candidate parameter values and using the `calc_maximin` function.
 
 ```{r maximin Dopt}
-theta_set <- rbind(c(0.5, 0.05), c(0, 0.05), c(0.5, 0))
+library(cvxDesign)
+
+## regression function
+quad_reg <- function(x) c(1, x, x^2)
+
+## candidate set
+u <- seq(-1, 1, length.out = 41)
+
+## -------------------------------
+## Step 1: single-objective designs
+## -------------------------------
+res_D <- compute_design_SO(
+  u = u,
+  f = quad_reg,
+  criterion = "D"
+)
+
+res_A <- compute_design_SO(
+  u = u,
+  f = quad_reg,
+  criterion = "A"
+)
+
+## reference losses
+loss_ref <- list(
+  D = res_D$loss,
+  A = res_A$loss
+)
+
+print(loss_ref)
+
+## -------------------------------
+## Step 2: maximin design
+## -------------------------------
+res_DA <- compute_maximin_design(
+  u = u,
+  f = quad_reg,
+  loss_ref = loss_ref,
+  criteria = c("D", "A")
+)
+
+## -------------------------------
+## Step 3: inspect result
+## -------------------------------
+print(res_DA$design)
+print(res_DA$loss)
+print(res_DA$efficiency)
+
+cat("tstar =", res_DA$tstar, "\n")
+cat("1 / tstar =", 1 / res_DA$tstar, "\n")
+cat("min efficiency =", min(res_DA$efficiency), "\n")
+
+## -------------------------------
+## Step 4: numerical checks
+## -------------------------------
+tol <- 1e-4
+
+eq1 <- abs(res_DA$efficiency["D"] - res_DA$efficiency["A"])
+eq2 <- abs(min(res_DA$efficiency) - 1 / res_DA$tstar)
+
+cat("|eff_D - eff_A| =", eq1, "\n")
+cat("|min(eff) - 1/tstar| =", eq2, "\n")
+
+stopifnot(eq1 < tol)
+stopifnot(eq2 < tol)
+
+cat("All checks passed.\n")
+```
 
 
 ## Planned features

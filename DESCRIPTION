@@ -1,7 +1,7 @@
 Package: cvxDesign
 Type: Package
 Title: Compute Optimal Regression Design under the Ordinary Least Squares Estimator for Variety of the design criteria
-Version: 0.1.0
+Version: 0.1.1
 Authors@R:  c(
       person(given = "Chi-Kuang", family = "Yeh",
              role = c("aut", "cre"),
@@ -18,7 +18,9 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Imports: 
-    CVXR (>= 1.8.0)
+    CVXR (>= 1.8.0),
+    tibble,
+    MASS
 Suggests: 
     knitr,
     rmarkdown,

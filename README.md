@@ -1,6 +1,6 @@
 # cvxDesign: Optimal experimental designs via convex optimization
 
-2026-03-19
+2026-03-22
 
 <!-- badges: start -->
 
@@ -312,6 +312,144 @@ dout$status
 ```
 
     [1] "optimal"
+
+## For multiple objective design
+
+### Maximin design
+
+The maximin design is a robust design that maximizes the minimum
+efficiency across a set of candidate parameter values or different
+design criteria. For instance, one may want to find a design that
+performs well across multiple nominal parameter values in a non-linear
+model. This can be achieved by specifying a set of candidate parameter
+values and using the `calc_maximin` function.
+
+``` r
+library(cvxDesign)
+
+## regression function
+quad_reg <- function(x) c(1, x, x^2)
+
+## candidate set
+u <- seq(-1, 1, length.out = 41)
+
+## -------------------------------
+## Step 1: single-objective designs
+## -------------------------------
+res_D <- compute_design_SO(
+  u = u,
+  f = quad_reg,
+  criterion = "D"
+)
+
+res_A <- compute_design_SO(
+  u = u,
+  f = quad_reg,
+  criterion = "A"
+)
+
+## reference losses
+loss_ref <- list(
+  D = res_D$loss,
+  A = res_A$loss
+)
+
+print(loss_ref)
+```
+
+    $D
+    [1] 1.909543
+
+    $A
+    [1] 8
+
+``` r
+## -------------------------------
+## Step 2: maximin design
+## -------------------------------
+res_DA <- compute_maximin_design(
+  u = u,
+  f = quad_reg,
+  loss_ref = loss_ref,
+  criteria = c("D", "A")
+)
+
+## -------------------------------
+## Step 3: inspect result
+## -------------------------------
+print(res_DA$design)
+```
+
+    # A tibble: 3 × 2
+      point weight
+      <dbl>  <dbl>
+    1    -1  0.285
+    2     0  0.430
+    3     1  0.285
+
+``` r
+print(res_DA$loss)
+```
+
+    $D
+    [1] 1.968502
+
+    $A
+    [1] 8.158781
+
+``` r
+print(res_DA$efficiency)
+```
+
+            D         A 
+    0.9805388 0.9805387 
+
+``` r
+cat("tstar =", res_DA$tstar, "\n")
+```
+
+    tstar = 1.019848 
+
+``` r
+cat("1 / tstar =", 1 / res_DA$tstar, "\n")
+```
+
+    1 / tstar = 0.9805387 
+
+``` r
+cat("min efficiency =", min(res_DA$efficiency), "\n")
+```
+
+    min efficiency = 0.9805387 
+
+``` r
+## -------------------------------
+## Step 4: numerical checks
+## -------------------------------
+tol <- 1e-4
+
+eq1 <- abs(res_DA$efficiency["D"] - res_DA$efficiency["A"])
+eq2 <- abs(min(res_DA$efficiency) - 1 / res_DA$tstar)
+
+cat("|eff_D - eff_A| =", eq1, "\n")
+```
+
+    |eff_D - eff_A| = 8.237729e-08 
+
+``` r
+cat("|min(eff) - 1/tstar| =", eq2, "\n")
+```
+
+    |min(eff) - 1/tstar| = 4.024065e-08 
+
+``` r
+stopifnot(eq1 < tol)
+stopifnot(eq2 < tol)
+
+cat("All checks passed.\n")
+```
+
+    All checks passed.
 
 ## Planned features
 

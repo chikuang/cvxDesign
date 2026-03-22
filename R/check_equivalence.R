@@ -1,22 +1,41 @@
 #' Check the equivalence theorem on a finite candidate set
 #'
+#' Uses the same directional derivatives as [calc_directional_derivatives()] and
+#' [check_equivalence_general()] with a single criterion. For maximin or compound
+#' criteria, use [check_equivalence_general()].
+#'
 #' @param design_obj Output from calc_Dopt(), calc_Aopt(), or calc_copt().
 #' @param f Regression function returning a numeric vector.
 #' @param u Candidate design points. If omitted, uses design_obj$candidates.
 #' @param tol Numerical tolerance for checking nonpositivity and equality.
+#' @param use_ginv Passed to [calc_directional_derivatives()] when `M` is singular.
 #'
 #' @return A list with directional derivative values and theorem checks.
 #' @export
 check_equivalence <- function(design_obj,
                               f,
                               u = NULL,
-                              tol = 1e-6) {
+                              tol = 1e-6,
+                              use_ginv = TRUE) {
   if (missing(design_obj) || is.null(design_obj$criterion)) {
     stop("`design_obj` must be a valid design object from cvxDesign.", call. = FALSE)
   }
 
+  if (inherits(design_obj, "cvx_maximin_design") ||
+        identical(design_obj$criterion, "maximin")) {
+    stop(
+      "Use check_equivalence_general() for maximin design objects.",
+      call. = FALSE
+    )
+  }
+
   if (missing(f) || !is.function(f)) {
     stop("`f` must be a regression function.", call. = FALSE)
+  }
+
+  crit <- toupper(design_obj$criterion)
+  if (!crit %in% c("D", "A", "C")) {
+    stop("Equivalence theorem supports criteria 'D', 'A', and 'c'.", call. = FALSE)
   }
 
   if (is.null(u)) {
@@ -24,28 +43,21 @@ check_equivalence <- function(design_obj,
   }
 
   M <- design_obj$info_matrix
-  Minv <- solve(M)
-  criterion <- tolower(design_obj$criterion)
+  c_vec <- if (crit == "C") design_obj$cVec else NULL
 
-  deriv_vals <- vapply(u, function(x) {
-    fx <- eval_regvec(x, f)
-
-    if (criterion == "d") {
-      p <- length(fx)
-      as.numeric(t(fx) %*% Minv %*% fx - p)
-
-    } else if (criterion == "a") {
-      as.numeric(t(fx) %*% Minv %*% Minv %*% fx - sum(diag(Minv)))
-
-    } else if (criterion == "c") {
-      cVec <- design_obj$cVec
-      as.numeric((t(fx) %*% Minv %*% cVec)^2 - as.numeric(t(cVec) %*% Minv %*% cVec))
-
-    } else {
-      stop("Equivalence theorem currently supports criteria 'D', 'A', and 'c'.",
-           call. = FALSE)
-    }
-  }, numeric(1))
+  dd_list <- calc_directional_derivatives(
+    u, M, f,
+    criteria = crit,
+    cVec = c_vec,
+    use_ginv = use_ginv
+  )
+  nm <- switch(
+    tolower(crit),
+    d = "dD",
+    a = "dA",
+    c = "dc"
+  )
+  deriv_vals <- dd_list[[nm]]
 
   support_pts <- design_obj$design$point
   support_idx <- match(support_pts, u)
@@ -59,8 +71,8 @@ check_equivalence <- function(design_obj,
     support_points = support_pts,
     support_values = support_vals,
     max_violation = max_violation,
-    all_nonpositive = all(deriv_vals <= tol),
-    support_equal_zero = all(abs(support_vals) <= max(10 * tol, tol)),
+    all_nonpositive = all(deriv_vals <= tol, na.rm = TRUE),
+    support_equal_zero = all(abs(support_vals) <= max(10 * tol, tol), na.rm = TRUE),
     criterion = design_obj$criterion,
     tol = tol
   )

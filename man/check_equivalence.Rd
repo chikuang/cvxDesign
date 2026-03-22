@@ -4,7 +4,7 @@
 \alias{check_equivalence}
 \title{Check the equivalence theorem on a finite candidate set}
 \usage{
-check_equivalence(design_obj, f, u = NULL, tol = 1e-06)
+check_equivalence(design_obj, f, u = NULL, tol = 1e-06, use_ginv = TRUE)
 }
 \arguments{
 \item{design_obj}{Output from calc_Dopt(), calc_Aopt(), or calc_copt().}
@@ -14,10 +14,14 @@ check_equivalence(design_obj, f, u = NULL, tol = 1e-06)
 \item{u}{Candidate design points. If omitted, uses design_obj$candidates.}
 
 \item{tol}{Numerical tolerance for checking nonpositivity and equality.}
+
+\item{use_ginv}{Passed to \code{\link[=calc_directional_derivatives]{calc_directional_derivatives()}} when \code{M} is singular.}
 }
 \value{
 A list with directional derivative values and theorem checks.
 }
 \description{
-Check the equivalence theorem on a finite candidate set
+Uses the same directional derivatives as \code{\link[=calc_directional_derivatives]{calc_directional_derivatives()}} and
+\code{\link[=check_equivalence_general]{check_equivalence_general()}} with a single criterion. For maximin or compound
+criteria, use \code{\link[=check_equivalence_general]{check_equivalence_general()}}.
 }
