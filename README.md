@@ -451,6 +451,154 @@ cat("All checks passed.\n")
 
     All checks passed.
 
+### Equivalence theorem
+
+``` r
+quad_reg <- function(x) c(1, x, x^2)
+u <- seq(-1, 1, length.out = 41)
+
+res_D <- compute_design_SO(u, quad_reg, criterion = "D")
+res_A <- compute_design_SO(u, quad_reg, criterion = "A")
+
+loss_ref <- list(
+  D = res_D$loss,
+  A = res_A$loss
+)
+
+res_DA <- compute_maximin_design(
+  u = u,
+  f = quad_reg,
+  loss_ref = loss_ref,
+  criteria = c("D", "A")
+)
+
+dd_DA <- calc_directional_derivatives(
+  u = u,
+  M = res_DA$info_matrix,
+  f = quad_reg,
+  criteria = c("D", "A")
+)
+
+eta_DA <- calc_eta_weights_maximin(
+  tstar = res_DA$tstar,
+  loss_ref = loss_ref,
+  loss_model = res_DA$loss,
+  directional_derivatives = dd_DA,
+  criteria = c("D", "A"),
+  q = length(quad_reg(0))
+)
+
+eta_DA
+```
+
+             D          A 
+    0.20059366 0.05124131 
+
+``` r
+quad_reg <- function(x) c(1, x, x^2)
+u <- seq(-1, 1, length.out = 41)
+
+res_D <- compute_design_SO(u, quad_reg, criterion = "D")
+res_A <- compute_design_SO(u, quad_reg, criterion = "A")
+
+loss_ref <- list(
+  D = res_D$loss,
+  A = res_A$loss
+)
+
+res_DA <- compute_maximin_design(
+  u = u,
+  f = quad_reg,
+  loss_ref = loss_ref,
+  criteria = c("D", "A")
+)
+
+dd_DA <- calc_directional_derivatives(
+  u = u,
+  M = res_DA$info_matrix,
+  f = quad_reg,
+  criteria = c("D", "A")
+)
+
+eta_DA <- calc_eta_weights_maximin(
+  tstar = res_DA$tstar,
+  loss_ref = loss_ref,
+  loss_model = res_DA$loss,
+  directional_derivatives = dd_DA,
+  criteria = c("D", "A"),
+  q = length(quad_reg(0))
+)
+
+eq_DA <- check_equivalence_maximin(
+  design_obj = res_DA,
+  directional_derivatives = dd_DA,
+  eta = eta_DA
+)
+
+print(eq_DA)
+```
+
+    $candidate_points
+     [1] -1.00 -0.95 -0.90 -0.85 -0.80 -0.75 -0.70 -0.65 -0.60 -0.55 -0.50 -0.45
+    [13] -0.40 -0.35 -0.30 -0.25 -0.20 -0.15 -0.10 -0.05  0.00  0.05  0.10  0.15
+    [25]  0.20  0.25  0.30  0.35  0.40  0.45  0.50  0.55  0.60  0.65  0.70  0.75
+    [37]  0.80  0.85  0.90  0.95  1.00
+
+    $support_points
+    [1] -1  0  1
+
+    $eta
+             D          A 
+    0.20059366 0.05124131 
+
+    $combined_directional_derivative
+     [1] -7.551101e-07 -1.713982e-01 -2.997728e-01 -3.905297e-01 -4.487821e-01
+     [6] -4.793509e-01 -4.867647e-01 -4.752602e-01 -4.487816e-01 -4.109813e-01
+    [11] -3.652192e-01 -3.145631e-01 -2.617888e-01 -2.093797e-01 -1.595271e-01
+    [16] -1.141303e-01 -7.479607e-02 -4.283931e-02 -1.928262e-02 -4.856427e-03
+    [21]  9.999463e-07 -4.856427e-03 -1.928262e-02 -4.283931e-02 -7.479607e-02
+    [26] -1.141303e-01 -1.595271e-01 -2.093797e-01 -2.617888e-01 -3.145631e-01
+    [31] -3.652192e-01 -4.109813e-01 -4.487816e-01 -4.752602e-01 -4.867647e-01
+    [36] -4.793509e-01 -4.487821e-01 -3.905297e-01 -2.997728e-01 -1.713982e-01
+    [41] -7.551086e-07
+
+    $support_values
+    [1] -7.551101e-07  9.999463e-07 -7.551086e-07
+
+    $max_violation
+    [1] 9.999463e-07
+
+    $min_value
+    [1] -0.4867647
+
+    $all_nonpositive
+    [1] TRUE
+
+    $support_equal_zero
+    [1] TRUE
+
+    $tol
+    [1] 1e-06
+
+    attr(,"class")
+    [1] "cvx_equivalence_maximin"
+
+``` r
+par(cex.lab = 1.5, cex.axis = 1.3, cex.main = 1.2)
+plot_equivalence_maximin(
+  design_obj = res_DA,
+  directional_derivatives = dd_DA,
+  eta = eta_DA,
+  criteria = c("D", "A"),
+  cex_lab = 1.5,
+  cex_axis = 1.3,
+  cex_main = 1.2,
+  mar = c(5, 7, 3, 1)
+)
+```
+
+![](README_files/figure-commonmark/multi-equivalence%20theorem-1.png)
+
 ## Planned features
 
 - [x] Basic package infrastructure

@@ -299,6 +299,100 @@ stopifnot(eq2 < tol)
 cat("All checks passed.\n")
 ```
 
+### Equivalence theorem
+
+
+``` {r multi-equivalence theorem}
+quad_reg <- function(x) c(1, x, x^2)
+u <- seq(-1, 1, length.out = 41)
+
+res_D <- compute_design_SO(u, quad_reg, criterion = "D")
+res_A <- compute_design_SO(u, quad_reg, criterion = "A")
+
+loss_ref <- list(
+  D = res_D$loss,
+  A = res_A$loss
+)
+
+res_DA <- compute_maximin_design(
+  u = u,
+  f = quad_reg,
+  loss_ref = loss_ref,
+  criteria = c("D", "A")
+)
+
+dd_DA <- calc_directional_derivatives(
+  u = u,
+  M = res_DA$info_matrix,
+  f = quad_reg,
+  criteria = c("D", "A")
+)
+
+eta_DA <- calc_eta_weights_maximin(
+  tstar = res_DA$tstar,
+  loss_ref = loss_ref,
+  loss_model = res_DA$loss,
+  directional_derivatives = dd_DA,
+  criteria = c("D", "A"),
+  q = length(quad_reg(0))
+)
+
+eta_DA
+
+quad_reg <- function(x) c(1, x, x^2)
+u <- seq(-1, 1, length.out = 41)
+
+res_D <- compute_design_SO(u, quad_reg, criterion = "D")
+res_A <- compute_design_SO(u, quad_reg, criterion = "A")
+
+loss_ref <- list(
+  D = res_D$loss,
+  A = res_A$loss
+)
+
+res_DA <- compute_maximin_design(
+  u = u,
+  f = quad_reg,
+  loss_ref = loss_ref,
+  criteria = c("D", "A")
+)
+
+dd_DA <- calc_directional_derivatives(
+  u = u,
+  M = res_DA$info_matrix,
+  f = quad_reg,
+  criteria = c("D", "A")
+)
+
+eta_DA <- calc_eta_weights_maximin(
+  tstar = res_DA$tstar,
+  loss_ref = loss_ref,
+  loss_model = res_DA$loss,
+  directional_derivatives = dd_DA,
+  criteria = c("D", "A"),
+  q = length(quad_reg(0))
+)
+
+eq_DA <- check_equivalence_maximin(
+  design_obj = res_DA,
+  directional_derivatives = dd_DA,
+  eta = eta_DA
+)
+
+print(eq_DA)
+
+par(cex.lab = 1.5, cex.axis = 1.3, cex.main = 1.2)
+plot_equivalence_maximin(
+  design_obj = res_DA,
+  directional_derivatives = dd_DA,
+  eta = eta_DA,
+  criteria = c("D", "A"),
+  cex_lab = 1.5,
+  cex_axis = 1.3,
+  cex_main = 1.2,
+  mar = c(5, 7, 3, 1)
+)
+```
 
 ## Planned features
 
@@ -333,3 +427,4 @@ The long-term goal of `cvxDesign` is to provide a general computational framewor
 3. Pukelsheim, Friedrich. (2006). *Optimal Design of Experiments*. SIAM.
 4. Silvey, Samuel D. (1980). *Optimal Design*. Chapman and Hall.
 5. Yeh, Chi-Kuang and collaborators. Ongoing work on convex-optimization-based methods for compound and application-driven optimal design problems.
+

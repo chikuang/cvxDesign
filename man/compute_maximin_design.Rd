@@ -22,45 +22,54 @@ compute_maximin_design(
 
 \item{f}{A function returning the regression vector at a single design point.}
 
-\item{loss_ref}{Named list of reference losses from single-objective designs.
-The entries should use the same scale as \code{\link[=scalar_loss_from_M]{scalar_loss_from_M()}}.}
+\item{loss_ref}{A named list of reference losses from single-objective
+designs.}
 
-\item{criteria}{Character vector containing any of \code{"D"}, \code{"A"}, \code{"Ds"},
+\item{criteria}{A character vector containing any of \code{"D"}, \code{"A"}, \code{"Ds"},
 \code{"c"}, or \code{"E"}.}
 
-\item{opts}{Named list of extra options. For \code{"Ds"} use \code{opts$cVec_Ds}; for
-\code{"c"} use \code{opts$cVec_c}.}
+\item{opts}{A named list of criterion-specific options. For \code{"Ds"}, supply
+\code{opts$cVec_Ds}; for \code{"c"}, supply \code{opts$cVec_c}.}
 
-\item{info_weight}{Optional function returning a nonnegative scalar multiplier
-for each rank-one information contribution.}
+\item{info_weight}{An optional function returning a nonnegative scalar
+multiplier for each rank-one information contribution.}
 
 \item{solver}{Solver passed to \code{\link[CVXR:psolve]{CVXR::psolve()}}.}
 
 \item{...}{Additional arguments passed to \code{\link[CVXR:psolve]{CVXR::psolve()}}.}
 
-\item{support_tol}{Weights smaller than this are dropped from the reported
+\item{support_tol}{Weights smaller than this are removed from the reported
 support.}
 
-\item{drop_tol}{Numerical tolerance for tiny solver noise before support
-cleanup.}
+\item{drop_tol}{Numerical tolerance used to remove tiny solver noise before
+support cleanup.}
 }
 \value{
 A list with components:
-\item{criterion}{Character vector of included criteria.}
+\item{criterion}{A character vector of included criteria.}
 \item{design}{A tibble of support points and weights.}
-\item{weights}{Full weight vector over the candidate set.}
-\item{candidates}{Candidate points.}
-\item{loss}{Named list of achieved losses.}
-\item{efficiency}{Named numeric vector of efficiencies.}
-\item{value}{Minimum efficiency across included criteria.}
-\item{tstar}{Optimal value of the maximin variable.}
-\item{M}{Optimal information matrix.}
+\item{weights}{The full weight vector over the candidate set.}
+\item{candidates}{The candidate design points.}
+\item{loss}{A named list of achieved losses.}
+\item{efficiency}{A named numeric vector of efficiencies.}
+\item{value}{The minimum efficiency across the included criteria.}
+\item{tstar}{The optimal value of the maximin variable.}
+\item{M}{The optimal information matrix.}
 \item{info_matrix}{Same as \code{M}.}
-\item{optval}{Raw solver objective value.}
-\item{status}{Solver status.}
-\item{solver}{Solver name.}
+\item{optval}{The raw solver objective value.}
+\item{status}{The solver status.}
+\item{solver}{The solver name.}
 }
 \description{
-Solves a joint convex optimization problem over a finite candidate set,
-following the same template as the MATLAB function \code{compute_maximin_design()}.
+Solves a joint convex optimization problem over a finite candidate set using
+a maximin-efficiency formulation. The model is specified by \code{f(x)} and,
+optionally, by a scalar weighting function \code{info_weight(x)} for each
+rank-one contribution to the information matrix.
+}
+\details{
+Reference losses in \code{loss_ref} should be computed on the same scale as the
+internal loss definition used by \code{compute_design_SO()}. For example, the
+D-optimal loss is \verb{-log det(M)}, the A-optimal loss is \code{tr(M^{-1})}, and the
+c- and Ds-optimal losses are quadratic forms of the inverse information
+matrix.
 }
