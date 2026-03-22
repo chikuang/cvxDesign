@@ -223,6 +223,16 @@ dout$value
 dout$status
 ```
 
+## For multiple objective design
+
+### Maximin design
+
+The maximin design is a robust design that maximizes the minimum efficiency across a set of candidate parameter values or different design criteria. For instance, one may want to find a design that performs well across multiple nominal parameter values in a non-linear model. This can be achieved by specifying a set of candidate parameter values and using the `calc_maximin` function.
+
+```{r maximin Dopt}
+theta_set <- rbind(c(0.5, 0.05), c(0, 0.05), c(0.5, 0))
+
+
 ## Planned features
 
 - [x] Basic package infrastructure
