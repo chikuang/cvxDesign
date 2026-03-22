@@ -303,90 +303,116 @@ cat("All checks passed.\n")
 
 
 ``` {r multi-equivalence theorem}
-quad_reg <- function(x) c(1, x, x^2)
-u <- seq(-1, 1, length.out = 41)
-
-res_D <- compute_design_SO(u, quad_reg, criterion = "D")
-res_A <- compute_design_SO(u, quad_reg, criterion = "A")
-
-loss_ref <- list(
-  D = res_D$loss,
-  A = res_A$loss
-)
-
-res_DA <- compute_maximin_design(
-  u = u,
-  f = quad_reg,
-  loss_ref = loss_ref,
-  criteria = c("D", "A")
-)
-
-dd_DA <- calc_directional_derivatives(
-  u = u,
-  M = res_DA$info_matrix,
-  f = quad_reg,
-  criteria = c("D", "A")
-)
-
-eta_DA <- calc_eta_weights_maximin(
-  tstar = res_DA$tstar,
-  loss_ref = loss_ref,
-  loss_model = res_DA$loss,
-  directional_derivatives = dd_DA,
-  criteria = c("D", "A"),
-  q = length(quad_reg(0))
-)
-
-eta_DA
+## =========================================================
+## Maximin multi-criterion design: D + A + c
+## =========================================================
 
 quad_reg <- function(x) c(1, x, x^2)
 u <- seq(-1, 1, length.out = 41)
 
-res_D <- compute_design_SO(u, quad_reg, criterion = "D")
-res_A <- compute_design_SO(u, quad_reg, criterion = "A")
+## target contrast for c-optimality
+cvec <- c(0, 1, 0)
 
+## ---------------------------------------------------------
+## Step 1: single-objective reference designs
+## ---------------------------------------------------------
+
+res_D <- compute_design_SO(
+  u = u,
+  f = quad_reg,
+  criterion = "D"
+)
+
+res_A <- compute_design_SO(
+  u = u,
+  f = quad_reg,
+  criterion = "A"
+)
+
+res_c <- compute_design_SO(
+  u = u,
+  f = quad_reg,
+  criterion = "c",
+  opts = list(cVec_c = cvec)
+)
+
+## reference losses
 loss_ref <- list(
   D = res_D$loss,
-  A = res_A$loss
+  A = res_A$loss,
+  c = res_c$loss
 )
 
-res_DA <- compute_maximin_design(
+print(loss_ref)
+
+## ---------------------------------------------------------
+## Step 2: maximin design
+## ---------------------------------------------------------
+
+res_DAc <- compute_maximin_design(
   u = u,
   f = quad_reg,
   loss_ref = loss_ref,
-  criteria = c("D", "A")
+  criteria = c("D", "A", "c"),
+  opts = list(cVec_c = cvec)
 )
 
-dd_DA <- calc_directional_derivatives(
+print(res_DAc$design)
+print(res_DAc$loss)
+print(res_DAc$efficiency)
+
+cat("tstar =", res_DAc$tstar, "\n")
+cat("1 / tstar =", 1 / res_DAc$tstar, "\n")
+cat("min efficiency =", min(res_DAc$efficiency), "\n")
+
+## ---------------------------------------------------------
+## Step 3: directional derivatives
+## ---------------------------------------------------------
+
+dd_DAc <- calc_directional_derivatives(
   u = u,
-  M = res_DA$info_matrix,
+  M = res_DAc$info_matrix,
   f = quad_reg,
-  criteria = c("D", "A")
+  criteria = c("D", "A", "c"),
+  cVec = cvec
 )
 
-eta_DA <- calc_eta_weights_maximin(
-  tstar = res_DA$tstar,
+## ---------------------------------------------------------
+## Step 4: eta weights for maximin equivalence theorem
+## ---------------------------------------------------------
+
+eta_DAc <- calc_eta_weights_maximin(
+  tstar = res_DAc$tstar,
   loss_ref = loss_ref,
-  loss_model = res_DA$loss,
-  directional_derivatives = dd_DA,
-  criteria = c("D", "A"),
+  loss_model = res_DAc$loss,
+  directional_derivatives = dd_DAc,
+  criteria = c("D", "A", "c"),
   q = length(quad_reg(0))
 )
 
-eq_DA <- check_equivalence_maximin(
-  design_obj = res_DA,
-  directional_derivatives = dd_DA,
-  eta = eta_DA
+print(eta_DAc)
+
+## ---------------------------------------------------------
+## Step 5: equivalence theorem check
+## ---------------------------------------------------------
+
+eq_DAc <- check_equivalence_maximin(
+  design_obj = res_DAc,
+  directional_derivatives = dd_DAc,
+  eta = eta_DAc
 )
 
-print(eq_DA)
+print(eq_DAc)
 
-par(cex.lab = 1.5, cex.axis = 1.3, cex.main = 1.2)
+## ---------------------------------------------------------
+## Step 6: plot
+## ---------------------------------------------------------
+
 plot_equivalence_maximin(
-  design_obj = res_DA,
-  directional_derivatives = dd_DA,
-  eta = eta_DA,
-  criteria = c("D", "A"),
+  design_obj = res_DAc,
+  directional_derivatives = dd_DAc,
+  eta = eta_DAc,
+  criteria = c("D", "A", "c"),
   cex_lab = 1.5,
   cex_axis = 1.3,
   cex_main = 1.2,
@@ -401,9 +427,9 @@ plot_equivalence_maximin(
 - [x] D-optimality
 - [x] A-optimality
 - [ ] E-optimality
-- [ ] c-optimality
-- [ ] Compound and multi-objective criteria
-- [ ] Equivalence theorem (sensitivity functions) diagnostics
+- [x] c-optimality
+- [x] Compound and multi-objective criteria
+- [x] Equivalence theorem (sensitivity functions) diagnostics
 - [ ] Exact design support on finite candidate sets
 - [ ] Benchmark examples and vignettes
 - [ ] Shiny app

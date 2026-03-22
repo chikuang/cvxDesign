@@ -454,88 +454,163 @@ cat("All checks passed.\n")
 ### Equivalence theorem
 
 ``` r
+## =========================================================
+## Maximin multi-criterion design: D + A + c
+## =========================================================
+
 quad_reg <- function(x) c(1, x, x^2)
 u <- seq(-1, 1, length.out = 41)
 
-res_D <- compute_design_SO(u, quad_reg, criterion = "D")
-res_A <- compute_design_SO(u, quad_reg, criterion = "A")
+## target contrast for c-optimality
+cvec <- c(0, 1, 0)
 
+## ---------------------------------------------------------
+## Step 1: single-objective reference designs
+## ---------------------------------------------------------
+
+res_D <- compute_design_SO(
+  u = u,
+  f = quad_reg,
+  criterion = "D"
+)
+
+res_A <- compute_design_SO(
+  u = u,
+  f = quad_reg,
+  criterion = "A"
+)
+
+res_c <- compute_design_SO(
+  u = u,
+  f = quad_reg,
+  criterion = "c",
+  opts = list(cVec_c = cvec)
+)
+
+## reference losses
 loss_ref <- list(
   D = res_D$loss,
-  A = res_A$loss
+  A = res_A$loss,
+  c = res_c$loss
 )
 
-res_DA <- compute_maximin_design(
-  u = u,
-  f = quad_reg,
-  loss_ref = loss_ref,
-  criteria = c("D", "A")
-)
-
-dd_DA <- calc_directional_derivatives(
-  u = u,
-  M = res_DA$info_matrix,
-  f = quad_reg,
-  criteria = c("D", "A")
-)
-
-eta_DA <- calc_eta_weights_maximin(
-  tstar = res_DA$tstar,
-  loss_ref = loss_ref,
-  loss_model = res_DA$loss,
-  directional_derivatives = dd_DA,
-  criteria = c("D", "A"),
-  q = length(quad_reg(0))
-)
-
-eta_DA
+print(loss_ref)
 ```
 
-             D          A 
-    0.20059366 0.05124131 
+    $D
+    [1] 1.909543
+
+    $A
+    [1] 8
+
+    $c
+    [1] 1
 
 ``` r
-quad_reg <- function(x) c(1, x, x^2)
-u <- seq(-1, 1, length.out = 41)
+## ---------------------------------------------------------
+## Step 2: maximin design
+## ---------------------------------------------------------
 
-res_D <- compute_design_SO(u, quad_reg, criterion = "D")
-res_A <- compute_design_SO(u, quad_reg, criterion = "A")
-
-loss_ref <- list(
-  D = res_D$loss,
-  A = res_A$loss
-)
-
-res_DA <- compute_maximin_design(
+res_DAc <- compute_maximin_design(
   u = u,
   f = quad_reg,
   loss_ref = loss_ref,
-  criteria = c("D", "A")
+  criteria = c("D", "A", "c"),
+  opts = list(cVec_c = cvec)
 )
 
-dd_DA <- calc_directional_derivatives(
+print(res_DAc$design)
+```
+
+    # A tibble: 3 × 2
+      point weight
+      <dbl>  <dbl>
+    1    -1  0.375
+    2     0  0.250
+    3     1  0.375
+
+``` r
+print(res_DAc$loss)
+```
+
+    $D
+    [1] 1.961659
+
+    $A
+    [1] 10.66667
+
+    $c
+    [1] 1.333333
+
+``` r
+print(res_DAc$efficiency)
+```
+
+            D         A         c 
+    0.9827780 0.7499999 0.7500000 
+
+``` r
+cat("tstar =", res_DAc$tstar, "\n")
+```
+
+    tstar = 1.333333 
+
+``` r
+cat("1 / tstar =", 1 / res_DAc$tstar, "\n")
+```
+
+    1 / tstar = 0.75 
+
+``` r
+cat("min efficiency =", min(res_DAc$efficiency), "\n")
+```
+
+    min efficiency = 0.7499999 
+
+``` r
+## ---------------------------------------------------------
+## Step 3: directional derivatives
+## ---------------------------------------------------------
+
+dd_DAc <- calc_directional_derivatives(
   u = u,
-  M = res_DA$info_matrix,
+  M = res_DAc$info_matrix,
   f = quad_reg,
-  criteria = c("D", "A")
+  criteria = c("D", "A", "c"),
+  cVec = cvec
 )
 
-eta_DA <- calc_eta_weights_maximin(
-  tstar = res_DA$tstar,
+## ---------------------------------------------------------
+## Step 4: eta weights for maximin equivalence theorem
+## ---------------------------------------------------------
+
+eta_DAc <- calc_eta_weights_maximin(
+  tstar = res_DAc$tstar,
   loss_ref = loss_ref,
-  loss_model = res_DA$loss,
-  directional_derivatives = dd_DA,
-  criteria = c("D", "A"),
+  loss_model = res_DAc$loss,
+  directional_derivatives = dd_DAc,
+  criteria = c("D", "A", "c"),
   q = length(quad_reg(0))
 )
 
-eq_DA <- check_equivalence_maximin(
-  design_obj = res_DA,
-  directional_derivatives = dd_DA,
-  eta = eta_DA
+print(eta_DAc)
+```
+
+               D            A            c 
+    1.231246e-06 4.166653e-02 6.666650e-01 
+
+``` r
+## ---------------------------------------------------------
+## Step 5: equivalence theorem check
+## ---------------------------------------------------------
+
+eq_DAc <- check_equivalence_maximin(
+  design_obj = res_DAc,
+  directional_derivatives = dd_DAc,
+  eta = eta_DAc
 )
 
-print(eq_DA)
+print(eq_DAc)
 ```
 
     $candidate_points
@@ -548,28 +623,28 @@ print(eq_DA)
     [1] -1  0  1
 
     $eta
-             D          A 
-    0.20059366 0.05124131 
+               D            A            c 
+    1.231246e-06 4.166653e-02 6.666650e-01 
 
     $combined_directional_derivative
-     [1] -7.551101e-07 -1.713982e-01 -2.997728e-01 -3.905297e-01 -4.487821e-01
-     [6] -4.793509e-01 -4.867647e-01 -4.752602e-01 -4.487816e-01 -4.109813e-01
-    [11] -3.652192e-01 -3.145631e-01 -2.617888e-01 -2.093797e-01 -1.595271e-01
-    [16] -1.141303e-01 -7.479607e-02 -4.283931e-02 -1.928262e-02 -4.856427e-03
-    [21]  9.999463e-07 -4.856427e-03 -1.928262e-02 -4.283931e-02 -7.479607e-02
-    [26] -1.141303e-01 -1.595271e-01 -2.093797e-01 -2.617888e-01 -3.145631e-01
-    [31] -3.652192e-01 -4.109813e-01 -4.487816e-01 -4.752602e-01 -4.867647e-01
-    [36] -4.793509e-01 -4.487821e-01 -3.905297e-01 -2.997728e-01 -1.713982e-01
-    [41] -7.551086e-07
+     [1] -3.329950e-07 -1.629517e-01 -2.850002e-01 -3.712849e-01 -4.266667e-01
+     [6] -4.557292e-01 -4.627777e-01 -4.518401e-01 -4.266664e-01 -3.907288e-01
+    [11] -3.472217e-01 -2.990619e-01 -2.488882e-01 -1.990618e-01 -1.516659e-01
+    [16] -1.085061e-01 -7.111020e-02 -4.072822e-02 -1.833236e-02 -4.617062e-03
+    [21]  9.989852e-07 -4.617062e-03 -1.833236e-02 -4.072822e-02 -7.111020e-02
+    [26] -1.085061e-01 -1.516659e-01 -1.990618e-01 -2.488882e-01 -2.990619e-01
+    [31] -3.472217e-01 -3.907288e-01 -4.266664e-01 -4.518401e-01 -4.627777e-01
+    [36] -4.557292e-01 -4.266667e-01 -3.712849e-01 -2.850002e-01 -1.629517e-01
+    [41] -3.329950e-07
 
     $support_values
-    [1] -7.551101e-07  9.999463e-07 -7.551086e-07
+    [1] -3.329950e-07  9.989852e-07 -3.329950e-07
 
     $max_violation
-    [1] 9.999463e-07
+    [1] 9.989852e-07
 
     $min_value
-    [1] -0.4867647
+    [1] -0.4627777
 
     $all_nonpositive
     [1] TRUE
@@ -584,12 +659,15 @@ print(eq_DA)
     [1] "cvx_equivalence_maximin"
 
 ``` r
-par(cex.lab = 1.5, cex.axis = 1.3, cex.main = 1.2)
+## ---------------------------------------------------------
+## Step 6: plot
+## ---------------------------------------------------------
+
 plot_equivalence_maximin(
-  design_obj = res_DA,
-  directional_derivatives = dd_DA,
-  eta = eta_DA,
-  criteria = c("D", "A"),
+  design_obj = res_DAc,
+  directional_derivatives = dd_DAc,
+  eta = eta_DAc,
+  criteria = c("D", "A", "c"),
   cex_lab = 1.5,
   cex_axis = 1.3,
   cex_main = 1.2,
