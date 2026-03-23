@@ -201,31 +201,45 @@ plot_equivalence(eq_c)
 For non-linear models, the information matrix depends on the unknown parameters. 
 In this case, the package supports local optimal design computation at a specified nominal parameter value. For instance, the peleg model is given as 
 $$
-y_i = \frac{\theta_1 x_i}{\theta_2 + x_i } + \varepsilon_i.
+y_i = y_0 + \frac{x_i}{\theta_1 + \theta_2 x_i } + \varepsilon_i.
 $$
 
 One needs to calculate the partial derivatives of the mean function with respect to the parameters, which will be used in the information matrix calculation. In this case, it is 
 $$
-\frac{\partial \eta}{\partial \theta_1} = \frac{x}{\theta_2 + x}, \quad
-\frac{\partial \eta}{\partial \theta_2} = -\frac{\theta_1 x}{(\theta_2 + x)^2}.
+\frac{\partial g(x,\theta)}{ \partial \theta_1} = -\frac{x}{(\theta_1+\theta_2 x)^2}, \quad
+\frac{\partial g(x,\theta)}{\partial \theta_2} = -\frac{x^2}{(\theta_1 + \theta_2 x)^2},
+$$
+that is 
+$$
+\frac{\partial g(x,\theta)}{\partial \theta} = \frac{-1}{(\theta_1+\theta_2x)^2} \begin{pmatrix} x \\ x^2
+\end{pmatrix}^\top.
 $$
 
-```{r peleg Dopt}
-peleg_reg <- function(x, theta) {
-    d1 <- x / (theta[2] + x)
-    d2 <- -theta[1] * x / (theta[2] + x)^2
-    c(d1, d2)
+``` {r}
+peleg_grad <- function(t, theta = c(0.5, 0.05)) {
+  k1 <- theta[1]
+  k2 <- theta[2]
+  d2 <- (k1 + k2 * t)^2
+
+  c(
+    -t / d2,
+    -t^2 / d2
+  )
 }
-u <- seq(0.1, 100, length.out = 1001)
-theta_nom <- c(0.5, 0.05)
-dout <- calc_Dopt(u, 
-                  function(x) peleg_reg(x, theta = theta_nom), 
-                  drop_tol = 1e-4)
-dout$design |>
-  dplyr::filter(.data$weight > 1e-3) |>
-  round(3)
-dout$value
-dout$status
+
+u <- 0:180
+
+res <- calc_Dopt(
+  u = u,
+  f = peleg_grad,
+  solver = "CLARABEL",
+  verbose = TRUE,
+  drop_tol = 1e-4
+)
+
+res$design |> round(3)
+res$value
+res$status
 ```
 
 ## For multiple objective design

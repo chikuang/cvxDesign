@@ -1,18 +1,10 @@
-#' Compute a D-optimal approximate design on a finite candidate set
-#'
-#' @param u Candidate design points.
-#' @param f Regression function returning a numeric vector.
-#' @param solver Solver name passed to CVXR. Default is "CLARABEL".
-#' @param ... Additional arguments passed to CVXR::psolve().
-#' @param drop_tol Threshold for removing near-zero weights.
-#'
-#' @return An object of class "cvx_d_design" and "cvx_design".
-#' @export
 calc_Dopt <- function(u,
-                             f,
-                             solver = "CLARABEL",
-                             ...,
-                             drop_tol = 1e-8) {
+                      f,
+                      solver = "CLARABEL",
+                      ...,
+                      drop_tol = 1e-8,
+                      ridge = 1e-8,
+                      use_matrix_form = FALSE) {
   if (!requireNamespace("CVXR", quietly = TRUE)) {
     stop("Package `CVXR` is required.", call. = FALSE)
   }
@@ -21,18 +13,25 @@ calc_Dopt <- function(u,
   Fmat <- build_model_matrix(u, f)
 
   n <- nrow(Fmat)
+  p <- ncol(Fmat)
 
   w <- CVXR::Variable(n, nonneg = TRUE)
 
-  M_expr <- Reduce(
-    `+`,
-    lapply(seq_len(n), function(i) {
-      w[i] * tcrossprod(Fmat[i, ])
-    })
-  )
+  if (use_matrix_form) {
+    F_cvx <- CVXR::Constant(Fmat)
+    M_expr <- t(F_cvx) %*% CVXR::DiagVec(w) %*% F_cvx
+  } else {
+    M_expr <- Reduce(
+      `+`,
+      lapply(seq_len(n), function(i) {
+        fi <- matrix(Fmat[i, ], ncol = 1)
+        w[i] * (fi %*% t(fi))
+      })
+    )
+  }
 
   problem <- CVXR::Problem(
-    CVXR::Maximize(CVXR::log_det(M_expr)),
+    CVXR::Maximize(CVXR::log_det(M_expr + ridge * diag(p))),
     constraints = list(sum(w) == 1)
   )
 
@@ -60,7 +59,8 @@ calc_Dopt <- function(u,
     value = crit_val,
     optval = optval,
     status = solver_status,
-    solver = solver
+    solver = solver,
+    ridge = ridge
   )
 
   class(out) <- c("cvx_d_design", "cvx_design")

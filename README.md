@@ -250,32 +250,32 @@ print(eq_d)
      [97]  0.92  0.94  0.96  0.98  1.00
 
     $directional_derivative
-      [1] -1.971e-05 -1.712e-01 -3.252e-01 -4.628e-01 -5.850e-01 -6.926e-01
+      [1] -1.564e-05 -1.712e-01 -3.252e-01 -4.628e-01 -5.850e-01 -6.926e-01
       [7] -7.862e-01 -8.667e-01 -9.348e-01 -9.913e-01 -1.037e+00 -1.072e+00
      [13] -1.098e+00 -1.115e+00 -1.123e+00 -1.125e+00 -1.119e+00 -1.106e+00
      [19] -1.088e+00 -1.065e+00 -1.037e+00 -1.005e+00 -9.686e-01 -9.295e-01
-     [25] -8.878e-01 -8.437e-01 -7.979e-01 -7.507e-01 -7.025e-01 -6.537e-01
+     [25] -8.878e-01 -8.437e-01 -7.979e-01 -7.507e-01 -7.025e-01 -6.538e-01
      [31] -6.048e-01 -5.559e-01 -5.076e-01 -4.600e-01 -4.136e-01 -3.685e-01
      [37] -3.251e-01 -2.836e-01 -2.442e-01 -2.072e-01 -1.728e-01 -1.410e-01
-     [43] -1.122e-01 -8.643e-02 -6.383e-02 -4.451e-02 -2.858e-02 -1.610e-02
-     [49] -7.149e-03 -1.760e-03  3.943e-05 -1.760e-03 -7.149e-03 -1.610e-02
-     [55] -2.858e-02 -4.451e-02 -6.383e-02 -8.643e-02 -1.122e-01 -1.410e-01
+     [43] -1.122e-01 -8.644e-02 -6.384e-02 -4.452e-02 -2.858e-02 -1.611e-02
+     [49] -7.157e-03 -1.768e-03  3.127e-05 -1.768e-03 -7.157e-03 -1.611e-02
+     [55] -2.858e-02 -4.452e-02 -6.384e-02 -8.644e-02 -1.122e-01 -1.410e-01
      [61] -1.728e-01 -2.072e-01 -2.442e-01 -2.836e-01 -3.251e-01 -3.685e-01
-     [67] -4.136e-01 -4.600e-01 -5.076e-01 -5.559e-01 -6.048e-01 -6.537e-01
+     [67] -4.136e-01 -4.600e-01 -5.076e-01 -5.559e-01 -6.048e-01 -6.538e-01
      [73] -7.025e-01 -7.507e-01 -7.979e-01 -8.437e-01 -8.878e-01 -9.295e-01
      [79] -9.686e-01 -1.005e+00 -1.037e+00 -1.065e+00 -1.088e+00 -1.106e+00
      [85] -1.119e+00 -1.125e+00 -1.123e+00 -1.115e+00 -1.098e+00 -1.072e+00
      [91] -1.037e+00 -9.913e-01 -9.348e-01 -8.667e-01 -7.862e-01 -6.926e-01
-     [97] -5.850e-01 -4.628e-01 -3.252e-01 -1.712e-01 -1.971e-05
+     [97] -5.850e-01 -4.628e-01 -3.252e-01 -1.712e-01 -1.564e-05
 
     $support_points
     [1] -1  0  1
 
     $support_values
-    [1] -1.971e-05  3.943e-05 -1.971e-05
+    [1] -1.564e-05  3.127e-05 -1.564e-05
 
     $max_violation
-    [1] 3.943e-05
+    [1] 3.127e-05
 
     $all_nonpositive
     [1] FALSE
@@ -323,44 +323,56 @@ For non-linear models, the information matrix depends on the unknown
 parameters. In this case, the package supports local optimal design
 computation at a specified nominal parameter value. For instance, the
 peleg model is given as $$
-y_i = \frac{\theta_1 x_i}{\theta_2 + x_i } + \varepsilon_i.
+y_i = y_0 + \frac{x_i}{\theta_1 + \theta_2 x_i } + \varepsilon_i.
 $$
 
 One needs to calculate the partial derivatives of the mean function with
 respect to the parameters, which will be used in the information matrix
 calculation. In this case, it is $$
-\frac{\partial \eta}{\partial \theta_1} = \frac{x}{\theta_2 + x}, \quad
-\frac{\partial \eta}{\partial \theta_2} = -\frac{\theta_1 x}{(\theta_2 + x)^2}.
+\frac{\partial g(x,\theta)}{ \partial \theta_1} = -\frac{x}{(\theta_1+\theta_2 x)^2}, \quad
+\frac{\partial g(x,\theta)}{\partial \theta_2} = -\frac{x^2}{(\theta_1 + \theta_2 x)^2},
+$$ that is $$
+\frac{\partial g(x,\theta)}{\partial \theta} = \frac{-1}{(\theta_1+\theta_2x)} \begin{pmatrix} x \\ x^2
+\end{pmatrix}^\top
 $$
 
 ``` r
-peleg_reg <- function(x, theta) {
-    d1 <- x / (theta[2] + x)
-    d2 <- -theta[1] * x / (theta[2] + x)^2
-    c(d1, d2)
+peleg_grad <- function(t, theta = c(0.5, 0.05)) {
+  k1 <- theta[1]
+  k2 <- theta[2]
+  d2 <- (k1 + k2 * t)^2
+
+  c(
+    -t / d2,
+    -t^2 / d2
+  )
 }
-u <- seq(0.1, 100, length.out = 1001)
-theta_nom <- c(0.5, 0.05)
-dout <- calc_Dopt(u, 
-                  function(x) peleg_reg(x, theta = theta_nom), 
-                  drop_tol = 1e-4)
-dout$design |>
-  dplyr::filter(.data$weight > 1e-3) |>
-  round(3)
+
+u <- 0:180
+
+res <- calc_Dopt(
+  u = u,
+  f = peleg_grad,
+  solver = "CLARABEL",
+  verbose = TRUE,
+  drop_tol = 1e-4
+)
+
+res$design |> round(3)
 ```
 
       point weight
-    1   0.1    0.5
-    2 100.0    0.5
+    1     9    0.5
+    2   180    0.5
 
 ``` r
-dout$value
+res$value
 ```
 
-    [1] 0.2067
+    [1] 14.88
 
 ``` r
-dout$status
+res$status
 ```
 
     [1] "optimal"
