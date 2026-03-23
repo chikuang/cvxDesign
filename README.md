@@ -328,12 +328,16 @@ $$
 
 One needs to calculate the partial derivatives of the mean function with
 respect to the parameters, which will be used in the information matrix
-calculation. In this case, it is $$
+calculation. In this case, it is
+
+$$
 \frac{\partial g(x,\theta)}{ \partial \theta_1} = -\frac{x}{(\theta_1+\theta_2 x)^2}, \quad
 \frac{\partial g(x,\theta)}{\partial \theta_2} = -\frac{x^2}{(\theta_1 + \theta_2 x)^2},
-$$ that is $$
-\frac{\partial g(x,\theta)}{\partial \theta} = \frac{-1}{(\theta_1+\theta_2x)} \begin{pmatrix} x \\ x^2
-\end{pmatrix}^\top
+$$ that is
+
+$$
+\frac{\partial g(x,\theta)}{\partial \theta} = \frac{-1}{(\theta_1+\theta_2x)^2} \begin{pmatrix} x \\ x^2
+\end{pmatrix}^\top.
 $$
 
 ``` r

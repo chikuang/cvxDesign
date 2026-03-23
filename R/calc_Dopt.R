@@ -1,3 +1,13 @@
+#' Compute a D-optimal approximate design on a finite candidate set
+#'
+#' @param u Candidate design points.
+#' @param f Regression function returning a numeric vector.
+#' @param solver Solver name passed to CVXR. Default is "CLARABEL".
+#' @param ... Additional arguments passed to CVXR::psolve().
+#' @param drop_tol Threshold for removing near-zero weights.
+#'
+#' @return An object of class "cvx_d_design" and "cvx_design".
+#' @export
 calc_Dopt <- function(u,
                       f,
                       solver = "CLARABEL",

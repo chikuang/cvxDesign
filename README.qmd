@@ -205,17 +205,19 @@ y_i = y_0 + \frac{x_i}{\theta_1 + \theta_2 x_i } + \varepsilon_i.
 $$
 
 One needs to calculate the partial derivatives of the mean function with respect to the parameters, which will be used in the information matrix calculation. In this case, it is 
+
 $$
 \frac{\partial g(x,\theta)}{ \partial \theta_1} = -\frac{x}{(\theta_1+\theta_2 x)^2}, \quad
 \frac{\partial g(x,\theta)}{\partial \theta_2} = -\frac{x^2}{(\theta_1 + \theta_2 x)^2},
 $$
 that is 
+
 $$
 \frac{\partial g(x,\theta)}{\partial \theta} = \frac{-1}{(\theta_1+\theta_2x)^2} \begin{pmatrix} x \\ x^2
 \end{pmatrix}^\top.
 $$
 
-``` {r}
+``` {r peleg}
 peleg_grad <- function(t, theta = c(0.5, 0.05)) {
   k1 <- theta[1]
   k2 <- theta[2]
