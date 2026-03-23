@@ -24,6 +24,11 @@ Julie Zhou (University of Victoria)
 
 
 
+``` {r}
+# options(scipen = 999)
+options(digits = 4)
+```
+
 ## Description
 
 `cvxDesign` is an R package for computing optimal experimental designs using convex optimization.  
@@ -237,10 +242,14 @@ quad_reg <- function(x) c(1, x, x^2)
 
 ## candidate set
 u <- seq(-1, 1, length.out = 41)
+```
 
-## -------------------------------
-## Step 1: single-objective designs
-## -------------------------------
+
+### Step 1: single-objective designs
+
+
+``` {r}
+
 res_D <- compute_design_SO(
   u = u,
   f = quad_reg,
@@ -260,20 +269,24 @@ loss_ref <- list(
 )
 
 print(loss_ref)
+```
 
-## -------------------------------
-## Step 2: maximin design
-## -------------------------------
+### Step 2: maximin design
+
+``` {r}
+
 res_DA <- compute_maximin_design(
   u = u,
   f = quad_reg,
   loss_ref = loss_ref,
   criteria = c("D", "A")
 )
+```
 
-## -------------------------------
-## Step 3: inspect result
-## -------------------------------
+### Step 3: inspect result
+
+``` {r}
+
 print(res_DA$design)
 print(res_DA$loss)
 print(res_DA$efficiency)
@@ -281,10 +294,13 @@ print(res_DA$efficiency)
 cat("tstar =", res_DA$tstar, "\n")
 cat("1 / tstar =", 1 / res_DA$tstar, "\n")
 cat("min efficiency =", min(res_DA$efficiency), "\n")
+```
 
-## -------------------------------
-## Step 4: numerical checks
-## -------------------------------
+
+### Step 4: numerical checks
+
+``` {r}
+
 tol <- 1e-4
 
 eq1 <- abs(res_DA$efficiency["D"] - res_DA$efficiency["A"])
@@ -364,10 +380,11 @@ print(res_DAc$efficiency)
 cat("tstar =", res_DAc$tstar, "\n")
 cat("1 / tstar =", 1 / res_DAc$tstar, "\n")
 cat("min efficiency =", min(res_DAc$efficiency), "\n")
+```
 
-## ---------------------------------------------------------
-## Step 3: directional derivatives
-## ---------------------------------------------------------
+### Step 3: directional derivatives
+
+``` {r step3}
 
 dd_DAc <- calc_directional_derivatives(
   u = u,
@@ -377,9 +394,11 @@ dd_DAc <- calc_directional_derivatives(
   cVec = cvec
 )
 
-## ---------------------------------------------------------
-## Step 4: eta weights for maximin equivalence theorem
-## ---------------------------------------------------------
+```
+
+### Step 4: eta weights for maximin equivalence theorem
+
+``` {r step4}
 
 eta_DAc <- calc_eta_weights_maximin(
   tstar = res_DAc$tstar,
@@ -391,10 +410,11 @@ eta_DAc <- calc_eta_weights_maximin(
 )
 
 print(eta_DAc)
+```
 
-## ---------------------------------------------------------
-## Step 5: equivalence theorem check
-## ---------------------------------------------------------
+### Step 5: equivalence theorem check
+
+``` {r step5}
 
 eq_DAc <- check_equivalence_maximin(
   design_obj = res_DAc,
@@ -403,10 +423,11 @@ eq_DAc <- check_equivalence_maximin(
 )
 
 print(eq_DAc)
+```
 
-## ---------------------------------------------------------
-## Step 6: plot
-## ---------------------------------------------------------
+### Step 6: plot
+
+``` {r step 6}
 
 plot_equivalence_maximin(
   design_obj = res_DAc,

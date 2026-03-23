@@ -1,6 +1,6 @@
 # cvxDesign: Optimal experimental designs via convex optimization
 
-2026-03-22
+2026-03-23
 
 <!-- badges: start -->
 
@@ -14,6 +14,11 @@ Chi-Kuang Yeh (Georgia State University)
 [![ORCID](https://img.shields.io/badge/ORCID-0000--0001--7057--2096-A6CE39?logo=orcid.png)](https://orcid.org/0000-0001-7057-2096)
 
 Julie Zhou (University of Victoria)
+
+``` r
+# options(scipen = 999)
+options(digits = 4)
+```
 
 ## Description
 
@@ -137,7 +142,7 @@ dout$design |> round(3)
 dout$value
 ```
 
-    [1] -1.909543
+    [1] -1.91
 
 ``` r
 dout$status
@@ -233,12 +238,59 @@ eq_d <- check_equivalence(dout, f = quad_reg)
 print(eq_d)
 ```
 
-    Equivalence theorem check
-    Criterion          : D 
-    Tolerance          : 1e-06 
-    Max violation      : 3.94291e-05 
-    All nonpositive    : FALSE 
-    Support equal zero : FALSE 
+    $candidate_points
+      [1] -1.00 -0.98 -0.96 -0.94 -0.92 -0.90 -0.88 -0.86 -0.84 -0.82 -0.80 -0.78
+     [13] -0.76 -0.74 -0.72 -0.70 -0.68 -0.66 -0.64 -0.62 -0.60 -0.58 -0.56 -0.54
+     [25] -0.52 -0.50 -0.48 -0.46 -0.44 -0.42 -0.40 -0.38 -0.36 -0.34 -0.32 -0.30
+     [37] -0.28 -0.26 -0.24 -0.22 -0.20 -0.18 -0.16 -0.14 -0.12 -0.10 -0.08 -0.06
+     [49] -0.04 -0.02  0.00  0.02  0.04  0.06  0.08  0.10  0.12  0.14  0.16  0.18
+     [61]  0.20  0.22  0.24  0.26  0.28  0.30  0.32  0.34  0.36  0.38  0.40  0.42
+     [73]  0.44  0.46  0.48  0.50  0.52  0.54  0.56  0.58  0.60  0.62  0.64  0.66
+     [85]  0.68  0.70  0.72  0.74  0.76  0.78  0.80  0.82  0.84  0.86  0.88  0.90
+     [97]  0.92  0.94  0.96  0.98  1.00
+
+    $directional_derivative
+      [1] -1.971e-05 -1.712e-01 -3.252e-01 -4.628e-01 -5.850e-01 -6.926e-01
+      [7] -7.862e-01 -8.667e-01 -9.348e-01 -9.913e-01 -1.037e+00 -1.072e+00
+     [13] -1.098e+00 -1.115e+00 -1.123e+00 -1.125e+00 -1.119e+00 -1.106e+00
+     [19] -1.088e+00 -1.065e+00 -1.037e+00 -1.005e+00 -9.686e-01 -9.295e-01
+     [25] -8.878e-01 -8.437e-01 -7.979e-01 -7.507e-01 -7.025e-01 -6.537e-01
+     [31] -6.048e-01 -5.559e-01 -5.076e-01 -4.600e-01 -4.136e-01 -3.685e-01
+     [37] -3.251e-01 -2.836e-01 -2.442e-01 -2.072e-01 -1.728e-01 -1.410e-01
+     [43] -1.122e-01 -8.643e-02 -6.383e-02 -4.451e-02 -2.858e-02 -1.610e-02
+     [49] -7.149e-03 -1.760e-03  3.943e-05 -1.760e-03 -7.149e-03 -1.610e-02
+     [55] -2.858e-02 -4.451e-02 -6.383e-02 -8.643e-02 -1.122e-01 -1.410e-01
+     [61] -1.728e-01 -2.072e-01 -2.442e-01 -2.836e-01 -3.251e-01 -3.685e-01
+     [67] -4.136e-01 -4.600e-01 -5.076e-01 -5.559e-01 -6.048e-01 -6.537e-01
+     [73] -7.025e-01 -7.507e-01 -7.979e-01 -8.437e-01 -8.878e-01 -9.295e-01
+     [79] -9.686e-01 -1.005e+00 -1.037e+00 -1.065e+00 -1.088e+00 -1.106e+00
+     [85] -1.119e+00 -1.125e+00 -1.123e+00 -1.115e+00 -1.098e+00 -1.072e+00
+     [91] -1.037e+00 -9.913e-01 -9.348e-01 -8.667e-01 -7.862e-01 -6.926e-01
+     [97] -5.850e-01 -4.628e-01 -3.252e-01 -1.712e-01 -1.971e-05
+
+    $support_points
+    [1] -1  0  1
+
+    $support_values
+    [1] -1.971e-05  3.943e-05 -1.971e-05
+
+    $max_violation
+    [1] 3.943e-05
+
+    $all_nonpositive
+    [1] FALSE
+
+    $support_equal_zero
+    [1] FALSE
+
+    $criterion
+    [1] "D"
+
+    $tol
+    [1] 1e-06
+
+    attr(,"class")
+    [1] "cvx_equivalence"
 
 ``` r
 plot_equivalence(eq_d)
@@ -305,7 +357,7 @@ dout$design |>
 dout$value
 ```
 
-    [1] 0.2067205
+    [1] 0.2067
 
 ``` r
 dout$status
@@ -332,10 +384,11 @@ quad_reg <- function(x) c(1, x, x^2)
 
 ## candidate set
 u <- seq(-1, 1, length.out = 41)
+```
 
-## -------------------------------
-## Step 1: single-objective designs
-## -------------------------------
+### Step 1: single-objective designs
+
+``` r
 res_D <- compute_design_SO(
   u = u,
   f = quad_reg,
@@ -358,25 +411,25 @@ print(loss_ref)
 ```
 
     $D
-    [1] 1.909543
+    [1] 1.91
 
     $A
     [1] 8
 
+### Step 2: maximin design
+
 ``` r
-## -------------------------------
-## Step 2: maximin design
-## -------------------------------
 res_DA <- compute_maximin_design(
   u = u,
   f = quad_reg,
   loss_ref = loss_ref,
   criteria = c("D", "A")
 )
+```
 
-## -------------------------------
-## Step 3: inspect result
-## -------------------------------
+### Step 3: inspect result
+
+``` r
 print(res_DA$design)
 ```
 
@@ -392,40 +445,39 @@ print(res_DA$loss)
 ```
 
     $D
-    [1] 1.968502
+    [1] 1.969
 
     $A
-    [1] 8.158781
+    [1] 8.159
 
 ``` r
 print(res_DA$efficiency)
 ```
 
-            D         A 
-    0.9805388 0.9805387 
+         D      A 
+    0.9805 0.9805 
 
 ``` r
 cat("tstar =", res_DA$tstar, "\n")
 ```
 
-    tstar = 1.019848 
+    tstar = 1.02 
 
 ``` r
 cat("1 / tstar =", 1 / res_DA$tstar, "\n")
 ```
 
-    1 / tstar = 0.9805387 
+    1 / tstar = 0.9805 
 
 ``` r
 cat("min efficiency =", min(res_DA$efficiency), "\n")
 ```
 
-    min efficiency = 0.9805387 
+    min efficiency = 0.9805 
+
+### Step 4: numerical checks
 
 ``` r
-## -------------------------------
-## Step 4: numerical checks
-## -------------------------------
 tol <- 1e-4
 
 eq1 <- abs(res_DA$efficiency["D"] - res_DA$efficiency["A"])
@@ -434,13 +486,13 @@ eq2 <- abs(min(res_DA$efficiency) - 1 / res_DA$tstar)
 cat("|eff_D - eff_A| =", eq1, "\n")
 ```
 
-    |eff_D - eff_A| = 8.237729e-08 
+    |eff_D - eff_A| = 8.238e-08 
 
 ``` r
 cat("|min(eff) - 1/tstar| =", eq2, "\n")
 ```
 
-    |min(eff) - 1/tstar| = 4.024065e-08 
+    |min(eff) - 1/tstar| = 4.024e-08 
 
 ``` r
 stopifnot(eq1 < tol)
@@ -498,7 +550,7 @@ print(loss_ref)
 ```
 
     $D
-    [1] 1.909543
+    [1] 1.91
 
     $A
     [1] 8
@@ -534,26 +586,26 @@ print(res_DAc$loss)
 ```
 
     $D
-    [1] 1.961659
+    [1] 1.962
 
     $A
-    [1] 10.66667
+    [1] 10.67
 
     $c
-    [1] 1.333333
+    [1] 1.333
 
 ``` r
 print(res_DAc$efficiency)
 ```
 
-            D         A         c 
-    0.9827780 0.7499999 0.7500000 
+         D      A      c 
+    0.9828 0.7500 0.7500 
 
 ``` r
 cat("tstar =", res_DAc$tstar, "\n")
 ```
 
-    tstar = 1.333333 
+    tstar = 1.333 
 
 ``` r
 cat("1 / tstar =", 1 / res_DAc$tstar, "\n")
@@ -565,13 +617,11 @@ cat("1 / tstar =", 1 / res_DAc$tstar, "\n")
 cat("min efficiency =", min(res_DAc$efficiency), "\n")
 ```
 
-    min efficiency = 0.7499999 
+    min efficiency = 0.75 
+
+### Step 3: directional derivatives
 
 ``` r
-## ---------------------------------------------------------
-## Step 3: directional derivatives
-## ---------------------------------------------------------
-
 dd_DAc <- calc_directional_derivatives(
   u = u,
   M = res_DAc$info_matrix,
@@ -579,11 +629,11 @@ dd_DAc <- calc_directional_derivatives(
   criteria = c("D", "A", "c"),
   cVec = cvec
 )
+```
 
-## ---------------------------------------------------------
-## Step 4: eta weights for maximin equivalence theorem
-## ---------------------------------------------------------
+### Step 4: eta weights for maximin equivalence theorem
 
+``` r
 eta_DAc <- calc_eta_weights_maximin(
   tstar = res_DAc$tstar,
   loss_ref = loss_ref,
@@ -596,14 +646,12 @@ eta_DAc <- calc_eta_weights_maximin(
 print(eta_DAc)
 ```
 
-               D            A            c 
-    1.231246e-06 4.166653e-02 6.666650e-01 
+            D         A         c 
+    1.231e-06 4.167e-02 6.667e-01 
+
+### Step 5: equivalence theorem check
 
 ``` r
-## ---------------------------------------------------------
-## Step 5: equivalence theorem check
-## ---------------------------------------------------------
-
 eq_DAc <- check_equivalence_maximin(
   design_obj = res_DAc,
   directional_derivatives = dd_DAc,
@@ -623,28 +671,26 @@ print(eq_DAc)
     [1] -1  0  1
 
     $eta
-               D            A            c 
-    1.231246e-06 4.166653e-02 6.666650e-01 
+            D         A         c 
+    1.231e-06 4.167e-02 6.667e-01 
 
     $combined_directional_derivative
-     [1] -3.329950e-07 -1.629517e-01 -2.850002e-01 -3.712849e-01 -4.266667e-01
-     [6] -4.557292e-01 -4.627777e-01 -4.518401e-01 -4.266664e-01 -3.907288e-01
-    [11] -3.472217e-01 -2.990619e-01 -2.488882e-01 -1.990618e-01 -1.516659e-01
-    [16] -1.085061e-01 -7.111020e-02 -4.072822e-02 -1.833236e-02 -4.617062e-03
-    [21]  9.989852e-07 -4.617062e-03 -1.833236e-02 -4.072822e-02 -7.111020e-02
-    [26] -1.085061e-01 -1.516659e-01 -1.990618e-01 -2.488882e-01 -2.990619e-01
-    [31] -3.472217e-01 -3.907288e-01 -4.266664e-01 -4.518401e-01 -4.627777e-01
-    [36] -4.557292e-01 -4.266667e-01 -3.712849e-01 -2.850002e-01 -1.629517e-01
-    [41] -3.329950e-07
+     [1] -3.330e-07 -1.630e-01 -2.850e-01 -3.713e-01 -4.267e-01 -4.557e-01
+     [7] -4.628e-01 -4.518e-01 -4.267e-01 -3.907e-01 -3.472e-01 -2.991e-01
+    [13] -2.489e-01 -1.991e-01 -1.517e-01 -1.085e-01 -7.111e-02 -4.073e-02
+    [19] -1.833e-02 -4.617e-03  9.990e-07 -4.617e-03 -1.833e-02 -4.073e-02
+    [25] -7.111e-02 -1.085e-01 -1.517e-01 -1.991e-01 -2.489e-01 -2.991e-01
+    [31] -3.472e-01 -3.907e-01 -4.267e-01 -4.518e-01 -4.628e-01 -4.557e-01
+    [37] -4.267e-01 -3.713e-01 -2.850e-01 -1.630e-01 -3.330e-07
 
     $support_values
-    [1] -3.329950e-07  9.989852e-07 -3.329950e-07
+    [1] -3.33e-07  9.99e-07 -3.33e-07
 
     $max_violation
-    [1] 9.989852e-07
+    [1] 9.99e-07
 
     $min_value
-    [1] -0.4627777
+    [1] -0.4628
 
     $all_nonpositive
     [1] TRUE
@@ -658,11 +704,9 @@ print(eq_DAc)
     attr(,"class")
     [1] "cvx_equivalence_maximin"
 
-``` r
-## ---------------------------------------------------------
-## Step 6: plot
-## ---------------------------------------------------------
+### Step 6: plot
 
+``` r
 plot_equivalence_maximin(
   design_obj = res_DAc,
   directional_derivatives = dd_DAc,
@@ -675,7 +719,7 @@ plot_equivalence_maximin(
 )
 ```
 
-![](README_files/figure-commonmark/multi-equivalence%20theorem-1.png)
+![](README_files/figure-commonmark/step%206-1.png)
 
 ## Planned features
 
