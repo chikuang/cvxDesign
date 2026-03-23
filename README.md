@@ -338,8 +338,7 @@ $$
 $$ that is
 
 $$
-\frac{\partial \eta(x,\theta)}{\partial \theta} = \frac{-1}{(\theta_1+\theta_2x)^2} \begin{pmatrix} x \\ x^2
-\end{pmatrix}.
+\frac{\partial \eta(x,\theta)}{\partial \theta} = \frac{-1}{(\theta_1+\theta_2x)^2} \left(x,~x^2 \right).
 $$
 
 ``` r
