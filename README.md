@@ -343,14 +343,13 @@ $$
 $$
 
 ``` r
-peleg_grad <- function(t, theta = c(0.5, 0.05)) {
+peleg_grad <- function(x, theta = c(0.5, 0.05)) {
   k1 <- theta[1]
   k2 <- theta[2]
-  d2 <- (k1 + k2 * t)^2
-
+  d2 <- (k1 + k2 * x)^2
   c(
-    -t / d2,
-    -t^2 / d2
+    -x / d2,
+    -x^2 / d2
   )
 }
 
