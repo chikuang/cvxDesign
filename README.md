@@ -59,10 +59,10 @@ y_i = \eta(\mathbf{x}_i, \boldsymbol{\theta}) + \varepsilon_i, \quad i = 1, \ldo
 $$
 
 where $y_i$ is the response observed at design point
-$\mathbf{x}_i \in \mathcal{X}$,  
-$\boldsymbol{\theta} \in \mathbb{R}^p$ is an unknown parameter vector,
-and $\eta(\mathbf{x}, \boldsymbol{\theta})$ is the mean response
-function, which may be linear or nonlinear in the parameters.
+$\mathbf{x}_i \in \mathcal{X}$, $\boldsymbol{\theta} \in \mathbb{R}^p$
+is an unknown parameter vector, and
+$\eta(\mathbf{x}, \boldsymbol{\theta})$ is the mean response function,
+which may be linear or nonlinear in the parameters.
 
 Optimal design seeks a design measure $\xi$ over the design space
 $\mathcal{X}$ that optimizes a scalar criterion based on the information
@@ -75,8 +75,8 @@ matrix $M(\xi)$. Common criteria include:
   specified linear combination of parameters.
 
 In many applications, the design problem can be formulated and solved
-using convex optimization. This makes it possible to handle a wide range
-of criteria and constraints in a unified computational framework.
+using **convex optimization**. This makes it possible to handle a wide
+range of criteria and constraints in a unified computational framework.
 
 The goal of `cvxDesign` is to provide a clean and extensible interface
 for these computations, together with tools for:
@@ -335,7 +335,9 @@ calculation. In this case, it is
 $$
 \frac{\partial \eta(x,\theta)}{ \partial \theta_1} = -\frac{x}{(\theta_1+\theta_2 x)^2}, \quad
 \frac{\partial \eta(x,\theta)}{\partial \theta_2} = -\frac{x^2}{(\theta_1 + \theta_2 x)^2},
-$$ that is
+$$
+
+that is
 
 $$
 \frac{\partial \eta(x,\theta)}{\partial \theta} = \frac{-1}{(\theta_1+\theta_2x)^2} \left(x,~x^2 \right).
